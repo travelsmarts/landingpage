@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Smart</title>
+
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none; /* Optional: removes border around iframe */
+  }
+</style>
+
+</head>
+<body>
+
+<iframe id="myFrame"></iframe>
+
+<script>
+var cors_api_url = 'https://proxy.prasannathapa.in/';
+
+function doCORSRequest(options, printResult) {
+    var x = new XMLHttpRequest();
+    x.open(options.method, cors_api_url + options.url);
+    x.onload = x.onerror = function() {
+        printResult(
+            (x.responseText || '')
+        );
+    };
+    if (/^POST/i.test(options.method)) {
+        x.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    }
+    x.send(options.data);
+}
+
+function manipulateIframeContent() {
+    var iframe = document.getElementById('myFrame');
+    try {
+        innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    } catch (error) {
+        doCORSRequest({
+            method: 'GET',
+            url: 'https://travelsmart55.wordpress.com'
+        }, function(response) {
+            document.getElementById('myFrame').srcdoc = response; // Set the srcdoc property of the iframe with the response
+        });
+    }
+    var wpAdminBar = innerDoc.getElementById('wpadminbar');
+    if (wpAdminBar) {
+        wpAdminBar.parentNode.removeChild(wpAdminBar);
+    }
+    var marketingBar = innerDoc.getElementById('marketingbar');
+    if (marketingBar) {
+        marketingBar.parentNode.removeChild(marketingBar);
+    }
+    var formContainer = innerDoc.getElementById('contact-form-block-template-canvas');
+    var form = formContainer.querySelector('form');
+    var action = form.getAttribute('action');
+    action = 'https://travelsmart55.wordpress.com' + action;
+    form.setAttribute('action', action);
+	var elementsWithClass = innerDoc.querySelectorAll('.has-marketing-bar');
+	elementsWithClass.forEach(function(element) {
+		element.classList.remove('has-marketing-bar');
+	});
+}
+
+doCORSRequest({
+    method: 'GET',
+    url: 'https://travelsmart55.wordpress.com'
+}, function(response) {
+    document.getElementById('myFrame').srcdoc = response; // Set the srcdoc property of the iframe with the response
+});
+
+document.getElementById('myFrame').onload = manipulateIframeContent;
+</script>
+
+</body>
+</html>
